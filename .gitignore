@@ -4,3 +4,5 @@ env/
 venv/
 mari0-gym/
 commands
+best_reworked_dataset_v4.onnx
+best_reworked_dataset_v4.pt
