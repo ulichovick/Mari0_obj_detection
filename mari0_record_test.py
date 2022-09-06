@@ -5,9 +5,9 @@ from PIL import ImageGrab
 path = r'/home/ulichovick/Imágenes/mario_dark.png'
 INPUT_WIDTH = 800
 INPUT_HEIGHT = 448
-SCORE_THRESHOLD = 0.6
-NMS_THRESHOLD = 0.6
-CONFIDENCE_THRESHOLD = 0.6
+SCORE_THRESHOLD = 0.5
+NMS_THRESHOLD = 0.5
+CONFIDENCE_THRESHOLD = 0.5
     
 # Text parameters.
 FONT_FACE = cv2.FONT_HERSHEY_SIMPLEX
@@ -87,7 +87,7 @@ def post_process(input_image, outputs):
 
 def run():
     # Load class names.
-    modelWeights = "best_reworked_dataset_v2.onnx"
+    modelWeights = "best_reworked_dataset_v4.onnx"
     net = cv2.dnn.readNet(modelWeights)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
