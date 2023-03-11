@@ -3,7 +3,7 @@ import numpy as np
 from PIL import ImageGrab
 import time
 
-path = r'/home/ulichovick/Imágenes/mario_dark.png'
+path = r'/home/ulichovick/Imágenes/labels_test.png'
 INPUT_WIDTH = 800
 INPUT_HEIGHT = 448
 SCORE_THRESHOLD = 0.5
@@ -85,38 +85,31 @@ def post_process(input_image, outputs):
         cv2.rectangle(input_image, (left, top), (left + width, top + height), BLUE, 3*THICKNESS)
         label = "{}:{:.2f}".format(classes[class_ids[i]], confidences[i])
         draw_label(input_image, label, left, top)
-    return input_image
+    return input_image, boxes, class_ids, indices
 
 def run():
+    classes = ['Coin_Block', 'Destroyable_Tile', 'Flag_Pole', 'Goomba', 'Koopa', 'Little_Mario', 'Mario dead', 'Pipe', 'Pipe_Tile', 'Tile', 'Win_Flag', 'floor']
     # Load class names.
     modelWeights = "best_reworked_dataset_v4.onnx"
     net = cv2.dnn.readNet(modelWeights)
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-    prev_frame_time = 0
-    while True:
-        img = ImageGrab.grab(bbox=(0, 29, 800, 448)) #x, y, w, h 
-        img_np = np.array(img)
-        frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
-        new_frame_time = time.time()
-        fps = 1/(new_frame_time-prev_frame_time)
-        prev_frame_time = new_frame_time
-        fps = int(fps)
-        fps = str(fps)
-        # Give the weight files to the model and load the network using       them.
-        # Process image.
-        detections = pre_process(frame, net)
-        img = post_process(frame.copy(), detections)
-        t, _ = net.getPerfProfile()
-        label = 'Inference time: %.2f ms' % (t * 1000.0 /  cv2.getTickFrequency())
-        fps_label = 'FPS: '+ fps
-        print(label)
-        cv2.putText(img, fps_label, (7, 20), FONT_FACE, FONT_SCALE, (0, 0, 255), THICKNESS, cv2.LINE_AA)
-        cv2.putText(img, label, (7, 40), FONT_FACE, FONT_SCALE,  (0, 0, 255), THICKNESS, cv2.LINE_AA)
-        cv2.imshow('Output', img)
-        if cv2.waitKey(1) & 0Xff == ord('q'):
-            break
+    img = cv2.imread(path) #x, y, w, h 
+    img_np = np.array(img)
+    frame = cv2.cvtColor(img_np, cv2.COLOR_BGR2RGB)
+    # Give the weight files to the model and load the network using       them.
+    # Process image.
+    detections = pre_process(frame, net)
+    img, box, class_ids, indices = post_process(frame.copy(), detections)
+    t, _ = net.getPerfProfile()
+    cv2.imshow('Output', img)
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
+    print(indices)
+    for i in indices:
+        print(str(classes[class_ids[i]]) +"\n"+ str(i))
+
+    print(class_ids)
 
 if __name__ == '__main__':
     run()
